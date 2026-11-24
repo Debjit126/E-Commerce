@@ -7,6 +7,14 @@ const { RecentlyViewd } = require("../models/recentlyViewd.js");
 const { ImageUpload } = require("../models/imageUpload.js");
 const express = require("express");
 const router = express.Router();
+
+// The storefront sends location=null / undefined / empty before a country is chosen.
+// Treat all of those, and "All", as "no location filter".
+const NO_LOCATION = ["", "null", "undefined"];
+router.use((req, res, next) => {
+  if (NO_LOCATION.includes(req.query.location)) req.query.location = "All";
+  next();
+});
 const multer = require("multer");
 const fs = require("fs");
 const mongoose = require("mongoose");
@@ -81,7 +89,7 @@ router.get(`/getProducts`, async (req, res) => {
   let productList = [];
 
   if (req.query.page !== undefined && req.query.perPage !== undefined) {
-    if (req.query.location !== undefined) {
+    if (req.query.location !== undefined && req.query.location !== "All") {
       const productListArr = await Product.find()
         .populate("category")
         .skip((page - 1) * perPage)
@@ -435,7 +443,7 @@ router.get(`/get/count`, async (req, res) => {
 
 router.get(`/featured`, async (req, res) => {
   let productList = [];
-  if (req.query.location !== undefined && req.query.location !== null) {
+  if (req.query.location !== undefined && req.query.location !== null && req.query.location !== "All") {
     const productListArr = await Product.find({ isFeatured: true }).populate(
       "category"
     );
