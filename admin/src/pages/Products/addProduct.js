@@ -349,7 +349,23 @@ const ProductUpload = () => {
               msg: "Images Uploaded!",
             });
           }, 500);
+        } else {
+          setUploading(false);
+          context.setAlertBox({
+            open: true,
+            error: true,
+            msg: "The upload finished but no image came back. Please try again.",
+          });
         }
+      });
+    })
+    .catch((error) => {
+      // Without this the "Uploading..." text never goes away when the upload fails.
+      setUploading(false);
+      context.setAlertBox({
+        open: true,
+        error: true,
+        msg: error?.message || "Image upload failed. Please try again.",
       });
     });
   };

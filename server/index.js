@@ -1,4 +1,6 @@
 require('dotenv/config');
+// multer does not create the upload folder, and git does not keep empty folders (e.g. on Render).
+require('fs').mkdirSync('uploads', { recursive: true });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
