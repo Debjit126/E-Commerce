@@ -87,6 +87,13 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/create", async (req, res) => {
+  // Refuse to save a banner without an image (the upload may have failed or the server restarted).
+  if (!imagesArr || imagesArr.length === 0) {
+    return res.status(422).json({
+      success: false,
+      msg: "No image to save. Upload an image, wait for its preview, then publish.",
+    });
+  }
   let newEntry = new HomeSideBanners({
     images: imagesArr,
     catId: req.body.catId,
